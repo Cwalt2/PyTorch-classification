@@ -1,7 +1,11 @@
 import os, shutil
 import numpy as np
+import kagglehub
 
-data_dir = "/kagglehub/datasets/shaunthesheep/microsoft-catsvsdogs-dataset/versions/1/PetImages"
+# Download latest version
+path = kagglehub.dataset_download("shaunthesheep/microsoft-catsvsdogs-dataset")
+
+data_dir = path
 output_dir = "data"  # where your train/val folders will go
 
 # Make dirs
