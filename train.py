@@ -8,7 +8,7 @@ import os
 # ========================
 # CONFIG
 # ========================
-data_dir = "/kagglehub/datasets/biaiscience/dogs-vs-cats/versions/1"  # change to your dataset path
+data_dir = "data"  # change to your dataset path
 batch_size = 16 # change for higher power cpu/gpu
 num_epochs = 2 # change to train for longer
 learning_rate = 0.001

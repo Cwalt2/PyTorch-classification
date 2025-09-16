@@ -5,24 +5,21 @@ from PIL import Image
 from glob import glob
 from pathlib import Path
 
-# Download latest version
+# Download latest version from kaggle
 dataset_path_str = kagglehub.dataset_download("shaunthesheep/microsoft-catsvsdogs-dataset")
 
-# The root path downloaded from Kaggle
 base_path = Path(dataset_path_str)
 
-# CORRECT: Point data_dir to the 'PetImages' subfolder
 data_dir = base_path / "PetImages"
 
 print(f"Correct data directory: {data_dir}")
-output_dir = "data"  # where your train/val folders will go
+output_dir = "data"  # where train/val folders will go
 
 # Make dirs
 for split in ["train", "val"]:
     for cls in ["cats", "dogs"]:
         os.makedirs(os.path.join(output_dir, split, cls), exist_ok=True)
 
-# Split ratio
 split_ratio = 0.8
 
 for cls in ["Cat", "Dog"]:
@@ -54,11 +51,9 @@ removed_count = 0
 
 for file_path in image_files:
     try:
-        # Try to open the image file
         with Image.open(file_path) as img:
-            img.verify() # Verify that it is, in fact, an image
+            img.verify()
     except (IOError, SyntaxError) as e:
-        # If it fails, print the path and delete the file
         print(f"DELETING corrupted file: {file_path}")
         os.remove(file_path)
         removed_count += 1
