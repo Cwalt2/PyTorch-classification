@@ -1,11 +1,20 @@
 import os, shutil
 import numpy as np
 import kagglehub
+from PIL import Image
+from glob import glob
+from pathlib import Path
 
 # Download latest version
-path = kagglehub.dataset_download("shaunthesheep/microsoft-catsvsdogs-dataset")
+dataset_path_str = kagglehub.dataset_download("shaunthesheep/microsoft-catsvsdogs-dataset")
 
-data_dir = path
+# The root path downloaded from Kaggle
+base_path = Path(dataset_path_str)
+
+# CORRECT: Point data_dir to the 'PetImages' subfolder
+data_dir = base_path / "PetImages"
+
+print(f"Correct data directory: {data_dir}")
 output_dir = "data"  # where your train/val folders will go
 
 # Make dirs
@@ -35,3 +44,23 @@ for cls in ["Cat", "Dog"]:
             os.path.join(data_dir, cls, img),
             os.path.join(output_dir, "val", cls.lower()+"s", img)
         )
+
+# clean data
+print(f"Scanning for corrupted images in: {output_dir}")
+
+# Get a list of all .jpg files recursively
+image_files = glob(os.path.join(output_dir, '**', '*.jpg'), recursive=True)
+removed_count = 0
+
+for file_path in image_files:
+    try:
+        # Try to open the image file
+        with Image.open(file_path) as img:
+            img.verify() # Verify that it is, in fact, an image
+    except (IOError, SyntaxError) as e:
+        # If it fails, print the path and delete the file
+        print(f"DELETING corrupted file: {file_path}")
+        os.remove(file_path)
+        removed_count += 1
+
+print(f"\nScan complete. Removed {removed_count} corrupted images.")

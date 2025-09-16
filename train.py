@@ -25,7 +25,7 @@ transform = {
         transforms.Normalize([0.485, 0.456, 0.406],
                             [0.229, 0.224, 0.225])
     ]),
-    "test": transforms.Compose([
+    "val": transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406],
@@ -34,11 +34,11 @@ transform = {
 }
 
 train_dataset = datasets.ImageFolder(os.path.join(data_dir, "train"), transform=transform["train"])
-test_dataset   = datasets.ImageFolder(os.path.join(data_dir, "test"),   transform=transform["test"])
+val_dataset   = datasets.ImageFolder(os.path.join(data_dir, "val"),   transform=transform["val"])
 
 # add num_workers if on linux to increase gpu usage
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-test_loader   = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+val_loader   = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # ========================
 # MODEL
@@ -96,7 +96,7 @@ for epoch in range(num_epochs):
     val_loss, val_corrects = 0.0, 0
 
     with torch.no_grad():
-        for inputs, labels in test_loader:
+        for inputs, labels in val_loader:
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, labels)
@@ -105,12 +105,12 @@ for epoch in range(num_epochs):
             val_loss += loss.item() * inputs.size(0)
             val_corrects += torch.sum(preds == labels.data)
 
-    val_loss /= len(test_dataset)
-    val_acc = val_corrects.double() / len(test_dataset)
+    val_loss /= len(val_dataset)
+    val_acc = val_corrects.double() / len(val_dataset)
     print(f"Val   Loss: {val_loss:.4f} Acc: {val_acc:.4f}")
 
 # ========================
 # SAVE MODEL
 # ========================
-torch.save(model.state_dict(), "models/cats_vs_dogs_resnet18_test.pth")
+torch.save(model.state_dict(), "models/cats_vs_dogs_resnet18.pth")
 print("\nModel saved to cats_vs_dogs_resnet18.pth")
