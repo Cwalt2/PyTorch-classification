@@ -1,13 +1,15 @@
+import os
 import torch
 import torch.nn as nn
 from torchvision import models, transforms
 from PIL import Image
+from IPython.display import display
 
 # ========================
 # CONFIG
 # ========================
 model_path = "models/cats_vs_dogs_resnet18_50_epochs.pth" # model path
-image_path = "test_images/cutecat.jpeg"  # test image path
+image_path = "test_images/"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ========================
@@ -34,12 +36,20 @@ model.eval()
 # ========================
 # PREDICT
 # ========================
-img = Image.open(image_path).convert("RGB")
-img_tensor = transform(img).unsqueeze(0).to(device)
-
-with torch.no_grad():
-    outputs = model(img_tensor)
-    _, preds = torch.max(outputs, 1)
-
 classes = ["cat", "dog"]
-print(f"Prediction: {classes[preds.item()]}")
+
+for filename in os.listdir(image_path):
+
+    full_path = os.path.join(image_path, filename) 
+    img = Image.open(full_path).convert("RGB")
+    im=Image.open(full_path)
+    im.thumbnail((500, 500))
+    img_tensor = transform(img).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        outputs = model(img_tensor)
+        _, preds = torch.max(outputs, 1)
+
+    classes = ["cat", "dog"]
+    display(im)
+    print(f"Prediction: {classes[preds.item()]}")
